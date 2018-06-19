@@ -1,49 +1,81 @@
 Shiny.addCustomMessageHandler("yearTotalJs",
 function(message){
-  var data = message;
-    var w = 0.4 * window.innerWidth;
-    var h = 0.9 * window.innerHeight;
-    var barPadding = 0;
 
-  var svg = d3.select("body")
-            .append("svg")  
-            .style("width", w + 'px')   // <-- Here
-            .style("height", h + 'px');
+  var data = message;
+    var w = 500;
+    var h = 500;
+    var barPadding = 0;
+    var scaleFactor = 10;
+    var padding = 40;
+    
   
-   
-  var bars = svg.selectAll("rect")
-    .data(data)  // <-- The answer is here!
+  var xScale = d3.scaleBand()
+               .domain(d3.range(data.length))
+               .rangeRound([0, w])
+               .paddingInner(0.05);
+  
+    var yScale = d3.scaleLinear()
+  .domain([d3.min(data, function(d){
+    return d.Total;
+  }), d3.max(data, function(d){
+    return d.Total;
+  })])
+  .rangeRound([h - padding, padding]);
+    
+    var parseTime = d3.timeParse("%Y-%d-%m");
+    
+    var plot = function(data, svg){
+       var rect = svg.selectAll("rect")
+    .data(data)  
     .enter()
     .append("rect")
    .attr("x", function(d, i) {
-    return i * (w/data.length);})
-   .attr("width", w / data.length - barPadding)
+    return xScale(i);
+   })
+   .attr("width", xScale.bandwidth)
    .attr("y", function(d){
-      return h - d.Total;
+      return yScale(d.Total);
    })
    .attr("height", function(d){
-     return d.Total;
+      return (h - yScale(d.Total)) - padding;
    })
    .attr("fill", function(d){
      return d.Colour;
    });
    
- svg.selectAll("text")
-   .data(data)
-   .enter()
-   .append("text")
-   .text(function(d){
-     return d.Total;
-   })
-   .attr("x", function(d, i){
-     return i * (w/data.length);
-   })
-   .attr("y", function(d){
-     return h - d.Total/ + 15;
-   })
-   .attr("text-anchor", "middle")
-   .attr("fill", "white")
+   var xAxis = d3.axisBottom()
+      .scale(xScale)
+      .tickFormat(d3.format("d"));
+      
+   var yAxis = d3.axisLeft()
+      .scale(yScale);
+      
+   svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + (h - padding) + ")")
+          .call(xAxis);
+          
+    svg.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(" + padding + ",0)")
+          .call(yAxis);
+          
+    };
+    
+    d3.select("svg").remove();
+    var svg = d3.select("body")
+            .append("svg")  
+            .style("width", w + 'px')   // <-- Here
+            .style("height", h + 'px');
+      plot(data, svg);
+ 
+
+ 
 
 
-})
+
+});
+
+   
+
 

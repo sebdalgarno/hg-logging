@@ -26,6 +26,10 @@ logged <- readRDS('input/logged.rds')
 centroid <- readRDS('input/centroid.rds')
 year.total <- read_csv('input/year_totals.csv')
 
+pals <- c(rgb(227, 94, 0, maxColorValue = 255), rgb(255, 255, 0, maxColorValue = 255))
+get_color <- colorRampPalette(pals)
+
+
 ### --- functions
 create_error <- function(message, header = "random") {
   showModal(modalDialog(

@@ -10,3 +10,11 @@ logged <- st_read('input/log17-YearHarvest-All-UTM8.gpkg') %>%
 
 saveRDS(logged, 'input/logged.rds')
 saveRDS(centroid %>% st_transform(4326) %>% st_coordinates, 'input/centroid.rds')
+
+colour.pal <- read_delim('input/hg_movie_colours_2017.txt', delim = ' ')
+colour.pal %<>% select(-X6, -blue) %>%
+  rename(Index = `#`,
+         Red = value, 
+         Green = red, 
+         Blue = green)
+colour.pal$Year <- desc(1901:2017)

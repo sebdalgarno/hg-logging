@@ -2,14 +2,20 @@ function(input, output, session) {
   
   year_total <- reactive({
     print(input$sliderYear)
-    year.total[which(year.total$Year <= input$sliderYear), ]
+    data <- year.total[which(year.total$Year <= input$sliderYear), ]
+    data$Colour <- get_color(n = nrow(data))
+    data %>% select(Year, Total, Colour) %>% as.data.frame()
   })
   
   observe({
-    data <- year_total()[1:5,]
-    data$Colour <- c("blue", 'yellow', 'red', 'orange', 'green')
-    data <- select(data, Total, Colour) %>% as.data.frame() %>% toJSON
-    print(data)
+    data <- year_total()
+    session$sendCustomMessage(type = "yearTotalJs", data %>% toJSON)
+  })
+  
+  observeEvent(input$random, {
+    data <- year_total()
+    data$Total <- runif(nrow(data), min = min(data$Total), max = max(data$Total))
+    data <- select(data, Year, Total, Colour) %>% as.data.frame() %>% toJSON
     session$sendCustomMessage(type = "yearTotalJs", data)
   })
   

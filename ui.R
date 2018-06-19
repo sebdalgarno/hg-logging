@@ -1,7 +1,7 @@
 ui = tagList(
   useShinyjs(),
   tags$head(includeCSS("www/style.css")),
-  tags$script(src = "https://d3js.org/d3.v3.min.js"),
+  tags$script(src = "https://d3js.org/d3.v4.min.js"),
   tags$head(includeScript("www/d3plot.js")),
   
   fluidPage(
@@ -22,7 +22,9 @@ ui = tagList(
                                             max = max(year.total$Year), 
                                             value = max(year.total$Year),
                                      sep = '', step = 1L, width = 500
-                                     ))
+                                     ),
+                         checkboxInput('checkSG', "Include Second Growth", value = TRUE),
+                         actionButton('random', "new data"))
            )
     ))
   )
